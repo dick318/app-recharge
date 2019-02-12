@@ -14,9 +14,9 @@
 
 ## 前言
 
-项目总后台管理系统的前端项目
+> 项目总后台管理系统的前端项目
 [传送门](https://github.com/xwlaix/admin-manage)。
-项目代理商后台管理系统的前端项目
+> 项目代理商后台管理系统的前端项目
 [传送门](https://github.com/xwlaix/agent-manage)。
 
 ## 项目介绍
@@ -28,7 +28,7 @@
 
 项目在线演示地址：[http://wx.szcoolfish.com/coolfish/tpl/main/dist/index.html#/bindCard?id=50](http://wx.szcoolfish.com/coolfish/tpl/main/dist/index.html#/bindCard?id=50)  
 
-![https://github.com/macrozheng/mall/blob/master/document/resource/mall-admin.gif](https://github.com/macrozheng/mall/blob/master/document/resource/mall-admin.gif)
+![https://github.com/xwlaix/app-recharge/blob/master/example.gif](https://github.com/xwlaix/app-recharge/blob/master/example.gif)
 
 ## 技术选型
 
