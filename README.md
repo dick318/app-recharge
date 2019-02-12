@@ -77,7 +77,7 @@ webpack -- webpack配置目录
 - 克隆源代码到本地，使用vscode打开，并完成编译;
 - 在vscode命令行中运行命令：npm install,下载相关依赖;
 - 在vscode命令行中运行命令：npm run dev,运行项目;
-- 访问地址：[http://localhost:8080](http://localhost:8080) 即可打开页面;
+- 访问地址：浏览器自动打开页面，默认设置为[http://localhost:8080](http://localhost:8080);
 - 如果遇到无法运行该命令，需要配置npm的环境变量，如在path变量中添加：C:\Users\zhenghong\AppData\Roaming\npm。
 
 ## 许可证
