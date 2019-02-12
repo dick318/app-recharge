@@ -12,7 +12,6 @@ const recharge = resolve => require(['../components/recharge.vue'], resolve)
 const register = resolve => require(['../components/register.vue'], resolve)
 const view = resolve => require(['../components/view.vue'], resolve)
 const password = resolve => require(['../components/password.vue'], resolve)
-const active = resolve => require(['../components/active.vue'], resolve)
 const order = resolve => require(['../components/order.vue'], resolve)
 const diagnose = resolve => require(['../components/diagnose.vue'], resolve)
 const find = resolve => require(['../components/find.vue'], resolve)
@@ -39,7 +38,6 @@ export default new VueRouter({
         { path: '/view', component: view , meta: {title: '图文回复'}},
         { path: '/password', component: password , meta: {title: '修改密码'}},
         { path: '/find', component: find , meta: {title: '找回密码'}},
-        { path: '/active', component: active , meta: {title: '卡片激活'}},
         { path: '/order', component: order , meta: {title: '订购套餐中'}},
         { path: '/diagnose', component: diagnose , meta: {title: '智能诊断'}},
         { path: '/changeCard', component: changeCard , meta: {title: '换卡'}},

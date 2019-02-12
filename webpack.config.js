@@ -35,12 +35,11 @@ module.exports = function (env) {
 
 
     var entry = {
-        index: SETTINGS.test?"./testApp/index.js":"./app/index.js", // application code
+        index: SETTINGS.test?"./testApp/index.js":"./src/index.js", // application code
         vendors: [
             'babel-polyfill',
             'vue',
-            'vue-router',
-            'vuex'
+            'vue-router'
         ]
     };
 
@@ -188,7 +187,7 @@ module.exports = function (env) {
         // 创建html
         new HtmlWebpackPlugin({
             filename: 'index.html',
-            template: __dirname + '/app/index.html',
+            template: __dirname + '/src/index.html',
             inject: 'true',
 
             // 需要依赖的模块

@@ -51,16 +51,6 @@ exports.getSettings = function (env) {
         settings.path.outputPath = "./";
         settings.path.publicPath = "/webpack3-simple-app/"
 
-    }else if (env && env.testdev){
-        settings.test = true;
-        settings.isDebug = true;
-        settings.isMinimize = false;
-        settings.showLog = true;
-        settings.outputFolderName = 'dist';
-
-        settings.path.outputPath = "./";
-        settings.path.publicPath = "/webpack3-simple-app/"
-
     }else if (env && env.build){
 
         settings.isDebug = false;
@@ -86,18 +76,6 @@ exports.getSettings = function (env) {
 
     }else if (env && env.prod){
         settings.showLog = true;
-        settings.isDebug = false;
-        settings.isMinimize = true;
-
-        settings.outputFolderName = 'dist';
-        settings.test = true;
-
-        settings.path.outputPath = "./";
-        settings.path.publicPath = "./"
-
-
-    }else if (env && env.prodBuild){
-        settings.showLog = false;
         settings.isDebug = false;
         settings.isMinimize = true;
 
