@@ -1,20 +1,37 @@
-# webpack3-simple-application
-simple application with webpack3+vue2+vueRouter2+vuex2
+# app-recharge
+simple application with webpack3+vue2+vueRouter2+Jquery
+ÒÆ¶¯¶Ë¶ÔÓÚÎïÁªÍø¿¨Á÷Á¿µÄ²éÑ¯³äÖµ¡£
 
-#ç®€å•çš„å¾®ä¿¡ç«¯å¯¹äºå¡ç‰‡æµé‡çš„æŸ¥è¯¢å……å€¼
+¿ª·¢
+# ¿ËÂ¡ÏîÄ¿
+git clone https://github.com/xwlaix/app-recharge.git
 
+# °²×°ÒÀÀµ
+npm install
 
-## Installation
+# ½¨Òé²»ÒªÓÃ cnpm °²×° »áÓĞ¸÷ÖÖ¹îÒìµÄbug ¿ÉÒÔÍ¨¹ıÈçÏÂ²Ù×÷½â¾ö npm ÏÂÔØËÙ¶ÈÂıµÄÎÊÌâ
+npm install --registry=https://registry.npm.taobao.org
 
-`$ npm install`
+# Æô¶¯·şÎñ
+npm run dev
+ä¯ÀÀÆ÷·ÃÎÊ http://localhost:8080
 
-## How to use
+·¢²¼
+# ¹¹½¨²âÊÔ»·¾³
+npm run prodBuild
 
-First copy the repo into your disk.
+# ¹¹½¨Éú²ú»·¾³
+npm run build
+ÆäËü
+# --·ÖÖ§±¾µØ²âÊÔ
+npm run testdev
 
-`$ git clone https://github.com/xwlaix/iotRecharge.git`
+# --·ÖÖ§Éú²ú
+npm run dist
 
+# --·ÖÖ§²âÊÔ
+npm run test
 
-Next you can see the result
+# --·ÖÖ§·¢²¼
+npm run prod
 
-`$ npm run dev`

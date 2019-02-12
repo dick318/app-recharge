@@ -1,54 +1,339 @@
 <template>
-    <div class="TotalContentBox">
+  <div class="TotalContentBox">
     <!--头部提示内容-->
-    <div class="Authentication-top">
-        换卡
-    </div>
+    <div class="Authentication-top">换卡</div>
     <!--认证部分-->
     <div class="Authentication-forms">
-        <div class="ietmOBX">
-            <span class="name">原卡号</span>
-            <input id="oldcard" class="text" type="text" value="" placeholder="请输入原ICCID或者接入号" v-model="oldcard">
-        </div>
-        <div class="ietmOBX">
-            <span class="name">套餐</span>
-            <input id="package" class="text" type="text" value="" placeholder="请输入原套餐" v-model="package">
-        </div>
-        <div class="ietmOBX">
-            <span class="name">姓名</span>
-            <input id="uname" class="text" type="text" placeholder="请与实名认证的保持一致" v-model="uname">
-        </div>
-        <div class="ietmOBX">
-            <span class="name">手机号码</span>
-            <input id="phone" class="text" type="text" placeholder="请与实名认证的保持一致" v-model="phone">
-        </div>
-        <div class="ietmOBX">
-            <span class="name">省市区</span>
-        </div>
-        <div class="ietmOBX">
-            <span class="name">详细地址</span>
-            <input id="detailArea" class="text" type="text" placeholder="请输入详细地址" v-model="detailArea">
-        </div>
+      <div class="ietmOBX">
+        <span class="name">原卡号</span>
+        <input
+          class="text"
+          type="text"
+          value
+          placeholder="请输入原ICCID或者接入号"
+          v-model.trim="form.oldcard"
+          @blur="check"
+          style="width:55%"
+        >
+        <span class="color-danger caption" :class="[activeClass, showClass]">{{showText}}</span>
+      </div>
+      <div class="ietmOBX">
+        <span class="name">套餐</span>
+        <input v-model.trim="form.packageName" class="text" type="text" value placeholder="请输入原套餐">
+      </div>
+      <div class="ietmOBX">
+        <span class="name">姓名</span>
+        <input class="text" type="text" placeholder="请与实名认证的保持一致" v-model.trim="form.uname">
+      </div>
+      <div class="ietmOBX">
+        <span class="name">手机号码</span>
+        <input class="text" type="text" placeholder="请与实名认证的保持一致" v-model.trim="form.phone">
+      </div>
+      <div class="ietmOBX">
+        <span class="name">省市区</span>
+        <input
+          v-model="addressArr"
+          class="text"
+          type="text"
+          placeholder="请选择地址"
+          @focus="showAddress = !showAddress"
+        >
+        <vue-address v-model="showAddress" @on-select="handleOnSelect"/>
+      </div>
+      <div class="ietmOBX">
+        <span class="name">详细地址</span>
+        <input class="text" type="text" placeholder="请输入详细地址" v-model.trim="detailArea">
+      </div>
+      <div class="ietmOBX" v-show="pay">
+        <span class="name">运费：</span>
+        <input class="text" v-model="money" readonly style="color: red!important;">
+      </div>
     </div>
-    <!-- 身份证上传部分 -->
+    <!-- 提交 -->
     <div class="UploadID-BOX">
-        <div class="ietmOBX">
-            <label for="remake" class="remake">备注</label>
-            <textarea name="" id="remake" cols="30" rows="4" placeholder="如有其他需求，请填写备注。" v-model="base"></textarea>
-            <div class="text-center">
-                提交申请后30天未收到货，请联系客服。
-            </div>
-            <div class="Authentication-footer add">
-                <p>提交</p>
-            </div>
+      <div class="ietmOBX">
+        <label for="remake" class="remake">备注</label>
+        <textarea
+          name
+          id="remake"
+          v-model.trim="form.base"
+          cols="30"
+          rows="4"
+          placeholder="代理商名下的卡换卡后还在代理商名下，如有其他需求，请填写备注。"
+        ></textarea>
+        <div class="text-center">注：换卡后新卡将会自动转入老卡对应的
+          <br>代理商下面，老卡内的余额和剩余
+          <br>流量也会自动转入新卡。
+          <br>提交申请后7天未收到货，请联系客服。
         </div>
-
+        <div class="Authentication-footer add" @click="add">
+          <p>提交</p>
+        </div>
+        <div class="Authentication-footer list" @click="jump">
+          <p>查询进度</p>
+        </div>
+      </div>
     </div>
-            <v-distpicker  ></v-distpicker>
-
-</div>
+  </div>
 </template>
+
+<script>
+import c from "../index";
+import VueAddress from "./vue-address/vue-address-native";
+
+export default {
+  beforeCreate: function() {
+    const _this = this;
+    if (navigator.userAgent.indexOf("MicroMessenger") > -1) {
+      if (window.location.search.indexOf("code") == -1) {
+        // 转授权链接
+        c.$post2(
+          c.javaWt + "client/v3/wxCodeUrl",
+          {
+            url: document.location.href,
+            uid: _this.$route.query.id || localStorage.getItem("id") || 50,
+            scope: "snsapi_userinfo"
+          },
+          function(res) {
+            if (res.status != 0) {
+              $.toptip(res.message, 2000, "error");
+              return;
+            }
+            window.location.href = res.data;
+          }
+        );
+      }
+    }
+  },
+  data() {
+    return {
+      showAddress: false,
+      form: {
+        uid: this.$route.query.id || localStorage.getItem("id") || 50,
+        oldcard: localStorage.getItem("cardNo"),
+        packageName: "",
+        uname: "",
+        phone: "",
+        address: "",
+        base: "",
+        openid: sessionStorage.getItem("openid"),
+        nickname: ""
+      },
+      activeClass: "success",
+      showClass: "hidden",
+      showText: "验证通过",
+      addressArr: [],
+      address: "",
+      detailArea: "",
+      money: "10元",
+      payArr: [7],
+      pay: ""
+    };
+  },
+  components: {
+    VueAddress
+  },
+  created() {
+    const _this = this;
+    localStorage.setItem(
+      "id",
+      _this.$route.query.id || localStorage.getItem("id")
+    );
+    if (navigator.userAgent.indexOf("MicroMessenger") > -1) {
+      if (!sessionStorage.getItem("openid")) {
+        _this.getOpenid();
+      } else {
+        if (!_this.form.nickname) {
+          _this.getNickName();
+        }
+      }
+    } else {
+      $.alert("请在微信公众号申请。", "注意", function() {
+        $.closeModal();
+      });
+    }
+
+    if (_this.form.oldcard) {
+      _this.chcekCard();
+    }
+  },
+  methods: {
+    chcekCard() {
+      const _this = this;
+      _this.activeClass = "success";
+      _this.showClass = "";
+      _this.showText = "验证通过";
+      if (_this.payArr.includes(+sessionStorage.getItem("remarks"))) {
+        _this.pay = false;
+      } else {
+        _this.pay = true;
+      }
+    },
+    getOpenid() {
+      const _this = this;
+      c.$post2(
+        c.javaWt + "client/v3/openid",
+        {
+          uid: _this.$route.query.id || localStorage.getItem("id"),
+          code: c.getUrlParam("code")
+        },
+        function(res) {
+          if (res.status == 0) {
+            sessionStorage.setItem("openid", res.data);
+            _this.form.openid = res.data;
+            let data = {
+              uid: _this.$route.query.id || localStorage.getItem("id"),
+              openid: sessionStorage.getItem("openid")
+            };
+            c.$post2(c.javaWt + "client/v3/wxInfo", data, function(res) {
+              if (res.status != 0) {
+                return;
+              }
+              _this.form.nickname = res.data.nickname;
+            });
+          }
+        }
+      );
+    },
+    getNickName() {
+      const _this = this;
+      let data = {
+        uid: _this.$route.query.id || localStorage.getItem("id"),
+        openid: sessionStorage.getItem("openid")
+      };
+      c.$post2(c.javaWt + "client/v3/wxInfo", data, function(res) {
+        if (res.status != 0) {
+          return;
+        }
+        _this.form.nickname = res.data.nickname;
+      });
+    },
+    jump() {
+      this.$router.push(`changeCardList`);
+    },
+    handleOnSelect(val) {
+      if (val) {
+        this.address = "";
+        this.addressArr = [];
+        for (let index = 0; index < val.length; index++) {
+          const element = val[index];
+          this.address =
+            (this.address ? this.address + "," : this.address) + element.name;
+          this.addressArr.push(element.name);
+        }
+      }
+    },
+    check() {
+      if (!this.form.oldcard) {
+        return;
+      }
+      const _this = this;
+      c.$post2(
+        c.javaWt + "client/v3/loginInfo",
+        { card: _this.form.oldcard, uid: 50 },
+        function(res) {
+          if (res.status == 1) {
+            _this.activeClass = "danger";
+            _this.showClass = "";
+            _this.showText = "验证失败";
+          } else {
+            _this.activeClass = "success";
+            _this.showClass = "";
+            _this.showText = "验证通过";
+            if (_this.payArr.includes(+res.data.remarks)) {
+              _this.pay = false;
+            } else {
+              _this.pay = true;
+            }
+          }
+        }
+      );
+    },
+    onBridgeReady: function(data) {
+      const _this = this;
+      WeixinJSBridge.invoke("getBrandWCPayRequest", data, function(res) {
+        if (res.err_msg == "get_brand_wcpay_request:ok") {
+          _this.$router.push(`changeCardList`);
+        } else {
+          $.toptip(res.message, 2000, "error");
+        }
+      });
+    },
+    add: function() {
+      const _this = this;
+      if (!this.form.oldcard) {
+        $.toptip("请输入您的卡号", 2000, "error");
+        return false;
+      }
+      if (this.activeClass == "danger" || !this.activeClass) {
+        $.toptip("请输入正确的卡号", 2000, "error");
+        return false;
+      }
+      if (!this.form.packageName) {
+        $.toptip("请输入您的套餐", 2000, "error");
+        return false;
+      }
+      //验证名字不为空&小于8位 通过
+      if (!this.form.uname) {
+        $.toptip("请输入您的名字", 2000, "error");
+        return false;
+      }
+      //验证手机号
+      if (!this.form.phone) {
+        $.toptip("请输入手机号码", 2000, "error");
+        return false;
+      }
+      var reg = /^1\d{10}$/;
+      if (!reg.test(this.form.phone)) {
+        $.toptip("手机号码格式不对!", 2000, "error");
+        return false;
+      }
+      if (this.addressArr.length < 2) {
+        $.toptip("请选择省市区", 2000, "error");
+        return false;
+      }
+      if (!this.detailArea) {
+        $.toptip("请输入详细地址", 2000, "error");
+        return;
+      }
+      $.showLoading();
+      let addresStr = this.addressArr;
+      addresStr += this.detailArea ? "," + this.detailArea : this.detailArea;
+      this.form.address = addresStr;
+      c.$post2(
+        "http://wx.szcoolfish.com/client/card/client/v3/saveCardReplace",
+        this.form,
+        function(res) {
+          $.hideLoading();
+          if (res.status == 0) {
+            if (res.data) {
+              _this.onBridgeReady(res.data);
+            } else {
+              _this.$router.push(`changeCardList`);
+            }
+          } else {
+            $.toptip(res.message, 2000, "error");
+          }
+        }
+      );
+    }
+  }
+};
+</script>
 <style scoped>
+.weui-dialog__bd {
+  color: #4d4d4d !important;
+}
+.Authentication-footer.add,
+.Authentication-footer.list {
+  padding: 4px 0 !important;
+}
+.Authentication-footer.list {
+  margin-bottom: 10px;
+}
+.success {
+  color: #0bb20c !important;
+}
 .Authentication-top {
   text-align: center;
   background: #099fde;
@@ -223,146 +508,3 @@ input {
   border-radius: 6px;
 }
 </style>
-
-<script>
-import c from "../index";
-import VDistpicker from 'v-distpicker'
-export default {
-  data() {
-    return {
-      uid: sessionStorage.getItem("id"),
-      uname: "",
-      phone: "",
-      oldcard: "",
-      orderID: "",
-      address: "",
-      detailArea:"",
-      base: "",
-      package: "",
-      code: ""
-    };
-  },
-  components: { VDistpicker },
-  methods: {
-  
-    upload: function(type) {
-      const _this = this;
-      const urlPrl = document.location.protocol + "//" + window.location.host;
-      wx.chooseImage({
-        count: 1, // 默认9
-        sizeType: ["compressed"], // 可以指定是原图还是压缩图，默认二者都有
-        sourceType: ["album", "camera"], // 可以指定来源是相册还是相机，默认二者都有
-        success: function(res) {
-          var localIds = res.localIds; // 返回选定照片的本地ID列表，localId可以作为img标签的src属性显示图片
-          wx.uploadImage({
-            localId: localIds.toString(), // 需要上传的图片的本地ID，由chooseImage接口获得
-            isShowProgressTips: 1, // 默认为1，显示进度提示
-            success: function(res) {
-              c.$post(
-                "?r=wms/personal/upload-img",
-                {
-                  uid: sessionStorage.getItem("id"),
-                  mediaid: [res.serverId]
-                },
-                function(data) {
-                  let picPath = data.data[0]; //picPath 取得图片的路径
-                  if (type == 1) {
-                    _this.pic1 = urlPrl + picPath;
-                  }
-                  if (type == 2) {
-                    _this.pic2 = urlPrl + picPath;
-                  }
-                  if (type == 3) {
-                    _this.pic3 = urlPrl + picPath;
-                  }
-                },
-                function(XMLHttpRequest, textStatus, errorThrown) {
-                  alert("提交失败" + textStatus);
-                }
-              );
-            }
-          });
-        }
-      });
-    },
-    pass: function() {
-      const _this = this;
-      if (!_this.password) {
-        $.toptip("请修改您的余额密码", 2000, "error");
-        return false;
-      }
-      c.$post(
-        "?r=wms/personal/change-password",
-        { newPassword: _this.password, oldPassword: "888888" },
-        function(res) {
-          if (res.code == 1) {
-            $.toptip("成功设置密码", 2000, "success");
-            _this.oldpsw = "true";
-          }
-        }
-      );
-    },
-    add: function() {
-      const _this = this;
-      if (!_this.kahao) {
-        $.toptip("请输入您的卡号", 2000, "error");
-        return false;
-      }
-      //验证名字不为空&小于8位 通过
-      if (!_this.username) {
-        $.toptip("请输入您的名字", 2000, "error");
-        return false;
-      }
-      //验证手机号
-      if (!_this.phone) {
-        $.toptip("请输入手机号码", 2000, "error");
-        return false;
-      }
-      var reg = /^1[3|4|5|7|8][0-9]\d{4,8}$/;
-      if (!reg.test(_this.phone)) {
-        $.toptip("手机号码格式不对!", 2000, "error");
-        return false;
-      }
-      //验证余额密码
-      if (!_this.oldpsw) {
-        $.toptip("请修改您的余额密码!", 2000, "error");
-        return false;
-      }
-      //验证身份证
-      if (!_this.ID) {
-        $.toptip("请输入您身份证!", 2000, "error");
-        return false;
-      }
-      if (!/(^\d{15}$)|(^\d{17}([0-9]|X)$)/.test(_this.ID)) {
-        $.toptip("请输入正确的身份证!", 2000, "error");
-        return false;
-      }
-      if (!_this.pic1 || !_this.pic2 || !_this.pic3) {
-        return $.toptip("请上传图片!", 2000, "error");
-      }
-      $.showLoading();
-      var url = "?r=wms/personal/update-celebrity";
-      c.$post(
-        url,
-        {
-          name: _this.username,
-          phone: _this.phone,
-          card: _this.kahao,
-          cardNo: _this.ID,
-          pic1: _this.pic1,
-          pic2: _this.pic2,
-          pic3: _this.pic3
-        },
-        function(res) {
-          $.hideLoading();
-          if (res.code == 1) {
-            _this.$router.push({ path: "home" });
-          } else {
-            $.toptip(res.msg, 2000, "error");
-          }
-        }
-      );
-    }
-  }
-};
-</script>

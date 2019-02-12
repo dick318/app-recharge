@@ -35,7 +35,7 @@ module.exports = function (env) {
 
 
     var entry = {
-        index: "./app/index.js", // application code
+        index: SETTINGS.test?"./testApp/index.js":"./app/index.js", // application code
         vendors: [
             'babel-polyfill',
             'vue',
@@ -134,10 +134,7 @@ module.exports = function (env) {
     ];
 
     var plugins = [
-        new vConsolePlugin({
-            filter: [],  // 需要过滤的入口文件
-            enable: false // 发布代码前记得改回 false
-        }),
+
         // 将公共库(vendor)和应用程序代码分离开来，并创建一个显式的 vendor chunk 以防止它频繁更改
         new webpack.optimize.CommonsChunkPlugin({
             name: ["vendors", "manifest"], // vendor libs   extracted manifest
@@ -215,8 +212,14 @@ module.exports = function (env) {
     }
 
     var devServer = {};
-
+    if (SETTINGS.showLog){
+        plugins.push(new vConsolePlugin({
+            filter: [],  // 需要过滤的入口文件
+            enable: true // 发布代码前记得改回 false
+        }));
+    }
     if (SETTINGS.isDebug) {
+
 
 
         // 启用 HMR

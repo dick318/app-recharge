@@ -45,7 +45,17 @@ exports.getSettings = function (env) {
 
         settings.isDebug = true;
         settings.isMinimize = false;
+        settings.showLog = true;
+        settings.outputFolderName = 'dist';
 
+        settings.path.outputPath = "./";
+        settings.path.publicPath = "/webpack3-simple-app/"
+
+    }else if (env && env.testdev){
+        settings.test = true;
+        settings.isDebug = true;
+        settings.isMinimize = false;
+        settings.showLog = true;
         settings.outputFolderName = 'dist';
 
         settings.path.outputPath = "./";
@@ -54,6 +64,7 @@ exports.getSettings = function (env) {
     }else if (env && env.build){
 
         settings.isDebug = false;
+        settings.showLog = false;
         settings.isMinimize = true;
 
         settings.outputFolderName = 'dist';
@@ -62,10 +73,47 @@ exports.getSettings = function (env) {
         settings.path.publicPath = "./"
 
     }else if (env && env.dist){
+        settings.showLog = true;
+        settings.isDebug = false;
+        settings.isMinimize = true;
+
+        settings.outputFolderName = 'prod';
+        settings.test = true;
+
+        settings.path.outputPath = "../../";
+        settings.path.publicPath = "./"
+
+
+    }else if (env && env.prod){
+        settings.showLog = true;
         settings.isDebug = false;
         settings.isMinimize = true;
 
         settings.outputFolderName = 'dist';
+        settings.test = true;
+
+        settings.path.outputPath = "./";
+        settings.path.publicPath = "./"
+
+
+    }else if (env && env.prodBuild){
+        settings.showLog = false;
+        settings.isDebug = false;
+        settings.isMinimize = true;
+
+        settings.outputFolderName = 'dist';
+        settings.test = true;
+
+        settings.path.outputPath = "./";
+        settings.path.publicPath = "./"
+
+
+    }else if (env && env.test){
+        settings.showLog = true;
+        settings.isDebug = false;
+        settings.isMinimize = true;
+
+        settings.outputFolderName = 'prod';
 
         settings.path.outputPath = "../../";
         settings.path.publicPath = "./"

@@ -2,19 +2,25 @@ import Vue from 'vue'
 import APP from './components/App.vue'
 import router from './router'
 import NProgress from 'nprogress'; // Progress 进度条
-
 import './css/jquery-weui.min.css'
 import './css/weui.min.css'
 import './css/we-more.css'
 import './js/jquery-weui.min.js'
+import './js/city-picker.min.js'
 import 'nprogress/nprogress.css'; // Progress 进度条 样式
 // import 'element-ui/lib/theme-chalk/index.css';
 // import VeeValidate from 'vee-validate';
 let urlPrefix = document.location.protocol + '//' + window.location.host;
+let javaPre = 'http://wx.szcoolfish.com/plat'
+let javaTest = 'http://120.79.150.124:10010/'
+let javaWY = 'http://47.106.39.59:8098'
+let javaWt = 'http://wx.szcoolfish.com/api/'
+// let javaWt = 'http://120.79.150.124:10010/'
 if (urlPrefix == 'http://localhost:8080') {
     urlPrefix = 'http://tw.szcoolfish.com'
 }
-const $post = (url, data, reback, timeout, error) => {
+
+const $post = (url, data, reback, timeout) => {
     $.ajax({
         url: urlPrefix + url,
         data: data,
@@ -27,18 +33,18 @@ const $post = (url, data, reback, timeout, error) => {
         success: reback,
         error: (XMLHttpRequest, textStatus, errorThrown) => {
             $.hideLoading();
-            if(errorThrown.status == 504){
+            if (errorThrown.status == 504) {
                 $.toptip('系统繁忙，请稍后再试', 2000, "error");
-            }else{
+            } else {
                 $.toptip('请求失败', 2000, "error");
             }
         },
         timeout: timeout
     })
 }
-const $post2 = (url, data, reback, error) => {
+const $post2 = (url, data, reback, timeout) => {
     $.ajax({
-        url: 'http://wx.szcoolfish.com' + url,
+        url: url,
         data: data,
         type: 'post',
         async: true,
@@ -47,7 +53,15 @@ const $post2 = (url, data, reback, error) => {
             withCredentials: true
         },
         success: reback,
-        error: error
+        error: (XMLHttpRequest, textStatus, errorThrown) => {
+            $.hideLoading();
+            if (errorThrown.status == 504) {
+                $.toptip('系统繁忙，请稍后再试', 2000, "error");
+            } else {
+                $.toptip('请求失败', 2000, "error");
+            }
+        },
+        timeout: timeout
     })
 }
 const $get = (url, reback, timeout, error) => {
@@ -61,9 +75,9 @@ const $get = (url, reback, timeout, error) => {
         },
         success: reback,
         error: (XMLHttpRequest, textStatus, errorThrown) => {
-            if(errorThrown.status == 504){
+            if (errorThrown.status == 504) {
                 $.toptip('系统繁忙，请稍后再试', 2000, "error");
-            }else{
+            } else {
                 $.toptip('请求失败', 2000, "error");
             }
         },
@@ -85,7 +99,7 @@ const $getAsync = (url, reback, error) => {
 }
 const $get2 = (url, reback, error) => {
     $.ajax({
-        url:url,
+        url: url,
         type: 'get',
         async: false,
         crossDomain: true,
@@ -157,15 +171,38 @@ function getUrlParam(module) {
     if (r != null) return (r[2]);
     return ''; //返回参数值
 }
+
+function setTitle(title) {
+    document.title = title;
+    let userAgent = window.navigator.userAgent.toLowerCase();
+    let isiOS = userAgent.indexOf('applewebkit') >= 0;
+    let isWechat = userAgent.indexOf('micromessenger') >= 0;
+    if (isiOS && isWechat) {
+        let iframe = document.createElement('iframe');
+        iframe.src = 'https://www.baidu.com/favicon.ico';
+        iframe.style.display = 'none';
+        document.body.appendChild(iframe);
+        iframe.onload = function () {
+            setTimeout(function () {
+                iframe.remove();
+            }, 0)
+        }
+    }
+}
+
 router.beforeEach((to, from, next) => {
+    if (to.meta && to.meta.title) {
+        setTitle(to.meta.title);
+    }
     NProgress.start();
     $.closeModal();
-    $.hideLoading()
     next();
     NProgress.done();
 })
 
+
 router.afterEach(() => {
+    $.hideLoading()
     NProgress.done(); // 结束Progress
 });
 
@@ -185,5 +222,11 @@ module.exports = {
     $getAsync: $getAsync,
     $get: $get,
     getUrlParam: getUrlParam,
-    accSub: accSub
+    accSub: accSub,
+    javaTest,
+    javaPre,
+    javaWY,
+    urlPrefix,
+    // javaPreWt,
+    javaWt
 }

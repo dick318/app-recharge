@@ -1,8 +1,13 @@
 {
     "presets": ["es2015", "stage-2"],
     "comments": false,
-    "plugins": [
-        "transform-vue-jsx", ["component", [{
+    "plugins": ["transform-vue-jsx", 
+        // ["import", {
+        //     "libraryName": "vant",
+        //     "libraryDirectory": "es",
+        //     "style": true
+        // }],
+        ["component", [{
             "libraryName": "element-ui",
             "styleLibraryName": "theme-default"
         }]]
